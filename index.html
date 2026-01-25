@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer">
+    <title>YGKing Music</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        body {
+            margin: 0;
+            background: #0a0a0a;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
+    <!-- 加密和解压缩库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <!-- 动态背景层 -->
+    <div class="bg-container">
+        <div class="bg-layer" id="bg-layer-1"></div>
+        <div class="bg-layer fade-out" id="bg-layer-2"></div>
+    </div>
+    <div class="bg-mask"></div>
+
+    <!-- 应用容器 -->
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Music</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-page="search">
+                    <i class="fas fa-search"></i>
+                    <span>搜索</span>
+                </button>
+                <button class="nav-item" data-page="playlist">
+                    <i class="fas fa-list-ul"></i>
+                    <span>歌单</span>
+                </button>
+                <button class="nav-item" data-page="queue">
+                    <i class="fas fa-bars-staggered"></i>
+                    <span>列表</span>
+                </button>
+                <button class="nav-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>历史</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 搜索页 -->
+            <section class="page search-page active" id="search-page">
+                <div class="page-header">
+                    <h1>搜索</h1>
+                </div>
+                <div class="search-box">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="搜索歌曲、歌手、专辑">
+                        <button id="search-clear" style="display: none;">
+                            <i class="fas fa-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="search-results" id="search-results">
+                    <div class="loading-state" id="loading-spinner" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>搜索中...</span>
+                    </div>
+                    <div class="results-list" id="results-list">
+                        <div class="empty-state">
+                            <i class="fas fa-music"></i>
+                            <p>输入关键词开始搜索</p>
+                        </div>
+                    </div>
+                    <div class="pagination" id="pagination" style="display: none;">
+                        <button class="page-btn" id="prev-page"><i class="fas fa-chevron-left"></i></button>
+                        <span id="page-info">1 / 1</span>
+                        <button class="page-btn" id="next-page"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 歌单管理页 -->
+            <section class="page playlist-page" id="playlist-page">
+                <div class="page-header">
+                    <h1>我的歌单</h1>
+                    <div class="header-actions">
+                        <button id="import-playlist-btn" title="导入歌单">
+                            <i class="fas fa-plus"></i> <span>导入歌单</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="playlist-section">
+                    <div class="saved-playlists" id="saved-playlists">
+                        <!-- 动态生成 -->
+                        <div class="empty-hint">暂无歌单</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 歌单详情页 -->
+            <section class="page detail-page" id="detail-page">
+                <div class="detail-header">
+                    <button class="back-btn" id="detail-back-btn">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="detail-cover">
+                        <img src="" id="detail-cover-img" alt="Playlist Cover">
+                    </div>
+                    <div class="detail-info">
+                        <h1 id="detail-title">歌单标题</h1>
+                        <div class="detail-meta" id="detail-meta">0首歌曲</div>
+                        <div class="detail-actions">
+                            <button class="primary-btn" id="detail-play-all">
+                                <i class="fas fa-play"></i> 播放全部
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="playlist-content" id="detail-list">
+                    <!-- Dynamic -->
+                </div>
+            </section>
+
+            <!-- 播放队列页 -->
+            <section class="page queue-page" id="queue-page">
+                <div class="page-header">
+                    <h1>正在播放</h1>
+                    <button id="clear-queue-btn" class="header-action" title="清空列表">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                <div class="playlist-content" id="playlist-list">
+                    <!-- 动态生成 -->
+                    <div class="empty-state">
+                        <p>列表为空</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 历史记录页 -->
+            <section class="page history-page" id="history-page">
+                <div class="page-header">
+                    <h1>播放历史</h1>
+                    <button class="header-action" id="clear-history" title="清空历史">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="playlist-content" id="history-list">
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>暂无播放记录</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 底部控制栏 -->
+    <footer class="bottom-bar">
+        <!-- 进度条 / 波形图 -->
+        <div class="waveform-container" id="waveform-container">
+            <canvas id="waveform-canvas"></canvas>
+            <div class="waveform-hover-time" id="waveform-hover-time"></div>
+        </div>
+
+        <div class="bar-content">
+            <!-- 左侧：歌曲信息 -->
+            <div class="now-playing">
+                <div class="cover-thumb" id="cover-thumb">
+                    <img src="https://y.gtimg.cn/mediastyle/global/img/playlist_300.png" alt="Cover" id="thumb-img">
+                </div>
+                <div class="song-info">
+                    <div class="song-title" id="bar-title">等待播放</div>
+                    <div class="song-artist" id="bar-artist">选择一首歌曲开始</div>
+                </div>
+            </div>
+
+            <!-- 中间：播放控制 -->
+            <div class="playback-controls">
+                <button class="ctrl-btn" id="prev-btn" title="上一首">
+                    <i class="fas fa-backward-step"></i>
+                </button>
+                <button class="ctrl-btn play-btn" id="play-btn" title="播放/暂停">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button class="ctrl-btn" id="next-btn" title="下一首">
+                    <i class="fas fa-forward-step"></i>
+                </button>
+            </div>
+
+            <!-- 右侧：时间和额外控制 -->
+            <div class="extra-controls">
+                <button class="ctrl-btn volume-btn" id="vol-down" title="减小音量">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <input type="range" id="volume-slider" class="volume-slider" min="0" max="1" step="0.01" value="1"
+                    title="音量调节">
+                <button class="ctrl-btn volume-btn" id="vol-up" title="增大音量">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="ctrl-btn quality-btn" id="quality-toggle" title="切换音质">
+                    <span id="quality-label">FLAC</span>
+                </button>
+                <input type="hidden" name="quality" id="quality-value" value="flac">
+                <button class="ctrl-btn mode-btn" id="mode-btn" title="顺序播放">
+                    <i class="fas fa-repeat"></i>
+                </button>
+                <div class="time-display">
+                    <span id="current-time">0:00</span>
+                    <span class="time-sep">/</span>
+                    <span id="total-time">0:00</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 沉浸式播放页（纯歌词） -->
+    <div class="immersive-player" id="immersive-player">
+        <button class="immersive-close" id="immersive-close">
+            <i class="fas fa-chevron-down"></i>
+        </button>
+
+        <button class="immersive-nav immersive-prev" id="immersive-prev">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <button class="immersive-nav immersive-next" id="immersive-next">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <div class="immersive-lyrics-full" id="immersive-lyrics">
+            <div class="lyrics-scroll" id="lyrics-scroll">
+                <div class="lyrics-placeholder">
+                    <i class="fas fa-music"></i>
+                    <p>暂无歌词</p>
+                </div>
+            </div>
+            <div class="lyrics-toggle-container" id="lyrics-toggle-container" style="display: none;">
+                <button class="lyrics-toggle-btn" id="lyrics-toggle-btn" title="切换翻译/罗马音">
+                    <span id="lyrics-toggle-label">译</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 通知容器 -->
+    <div class="notification-container" id="notification-container"></div>
+
+    <!-- 歌单导入模态框 (步骤1：输入UID) -->
+    <div class="modal-overlay" id="import-modal">
+        <div class="modal-container" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>导入歌单</h3>
+                <button class="modal-close" id="import-modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="number" id="import-uid-input" placeholder="请输入用户QQ号" style="text-align: center;">
+                </div>
+                <button class="primary-btn" id="fetch-user-playlists"
+                    style="width: 100%; margin-top: 16px; padding: 12px;">获取歌单</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 歌单选择模态框 (步骤2：选择歌单) -->
+    <div class="modal-overlay" id="import-selection-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>选择歌单</h3>
+                <button class="modal-close" id="selection-modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="user-playlist-list" id="import-list-container">
+                    <!-- 动态列表 -->
+                </div>
+                <div class="modal-actions"
+                    style="margin-top: 20px; display: flex; justify-content: space-between; gap: 10px;">
+                    <button class="primary-btn" id="import-all-btn"
+                        style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">导入全部</button>
+                    <button class="primary-btn" id="import-selected-confirm">导入选中 (<span
+                            id="selected-count">0</span>)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用 ES Modules -->
+    <script type="module" src="js/app.js"></script>
+
+    <!-- 注册 Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker 已注册'))
+                .catch(e => console.warn('Service Worker 注册失败:', e));
+        }
+    </script>
+</body>
+
+</html>
