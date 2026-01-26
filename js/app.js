@@ -2035,5 +2035,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.warn('Credential check failed:', e);
     }
 
-    console.log('QQ Music Web Player initialized');
+
 });
