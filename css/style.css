@@ -1,0 +1,1971 @@
+/* ============================================
+   QQ Music Web Player - Sidebar Layout
+   ============================================ */
+
+:root {
+    /* Colors */
+    --bg-dark: #0a0a0a;
+    --bg-sidebar: rgba(18, 18, 18, 0.95);
+    --bg-card: rgba(255, 255, 255, 0.05);
+    --bg-hover: rgba(255, 255, 255, 0.1);
+    --bg-active: rgba(255, 255, 255, 0.15);
+
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --text-tertiary: rgba(255, 255, 255, 0.4);
+
+    --accent: #1db954;
+    --accent-hover: #1ed760;
+
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* Sizing */
+    --sidebar-width: 220px;
+    --bottom-bar-height: 90px;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* ============================================
+   Background Layer
+   ============================================ */
+
+.bg-container {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+}
+
+.bg-layer {
+    position: absolute;
+    inset: -50%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(80px) saturate(1.5);
+    opacity: 0.4;
+    transition: opacity 1s ease;
+    animation: bgFloat 20s linear infinite;
+    animation-play-state: paused;
+}
+
+.bg-layer.fade-out {
+    opacity: 0;
+}
+
+body.playing .bg-layer {
+    animation-play-state: running;
+}
+
+@keyframes bgFloat {
+    0% {
+        transform: scale(1.2) rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1.2) rotate(360deg);
+    }
+}
+
+.bg-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+
+/* ============================================
+   App Container Layout
+   ============================================ */
+
+.app-container {
+    display: flex;
+    height: calc(100vh - var(--bottom-bar-height));
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--bg-sidebar);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.logo i {
+    color: var(--accent);
+    font-size: 24px;
+}
+
+.nav-menu {
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.nav-item i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: var(--bg-active);
+    color: var(--accent);
+}
+
+/* ============================================
+   Main Content Area
+   ============================================ */
+
+.main-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.page {
+    display: none;
+    padding: 24px 32px;
+    min-height: 100%;
+}
+
+.page.active {
+    display: block;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.header-action {
+    background: var(--bg-card);
+    border: none;
+    color: var(--text-secondary);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.header-action:hover {
+    background: var(--bg-hover);
+    color: #ff4444;
+}
+
+/* ============================================
+   Search Box
+   ============================================ */
+
+.search-box {
+    margin-bottom: 24px;
+}
+
+.search-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border-radius: 50px;
+    padding: 0 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.search-input-wrapper:focus-within {
+    border-color: var(--accent);
+    background: var(--bg-hover);
+}
+
+.search-input-wrapper i {
+    color: var(--text-tertiary);
+    font-size: 16px;
+}
+
+.search-input-wrapper input {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: var(--text-primary);
+    outline: none;
+}
+
+.search-input-wrapper input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.search-input-wrapper button {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 8px;
+}
+
+.search-input-wrapper button:hover {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   Search Results & Playlist
+   ============================================ */
+
+.search-results {
+    display: flex;
+    flex-direction: column;
+}
+
+.results-list,
+.playlist-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.loading-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    color: var(--text-tertiary);
+    font-size: 13px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-tertiary);
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.empty-state .hint {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Song Item */
+.song-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.song-item:hover {
+    background: var(--bg-hover);
+}
+
+.song-item.active {
+    background: var(--bg-active);
+}
+
+.song-item .item-cover {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--bg-card);
+}
+
+.song-item .item-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.song-item .item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.song-item .item-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.song-item.active .item-title {
+    color: var(--accent);
+}
+
+.song-item .item-artist {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-item .item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.action-btn.remove-btn:hover {
+    background: #ff4444;
+}
+
+/* Song Item Extra Info */
+.song-item .item-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-item .item-album {
+    color: var(--text-tertiary);
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-item .item-extra {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.song-item .item-duration {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+    min-width: 40px;
+    text-align: right;
+}
+
+.vip-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffd700, #ff8c00);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    margin-top: 16px;
+}
+
+.page-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#page-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   Bottom Bar
+   ============================================ */
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-bar-height);
+    background: rgba(18, 18, 18, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+}
+
+/* Waveform Progress Bar */
+.bottom-bar .waveform-container {
+    position: absolute;
+    top: -40px;
+    /* Sit exactly on top (height is 40px) */
+    left: 0;
+    right: 0;
+    height: 40px;
+    z-index: 90;
+    cursor: pointer;
+    /* No transition or hover growth */
+}
+
+/*
+.bottom-bar .waveform-container:hover {
+    top: -50px;
+    height: 50px;
+}
+*/
+
+/* Hide original progress bar elements */
+.bottom-bar .progress-bar {
+    display: none !important;
+}
+
+.bottom-bar .waveform-container canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.waveform-hover-time {
+    position: absolute;
+    top: -25px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.bottom-bar .waveform-container:hover .waveform-hover-time {
+    opacity: 1;
+}
+
+.bar-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    padding: 0 24px;
+    padding-top: 4px;
+}
+
+/* Now Playing */
+.now-playing {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+    max-width: 300px;
+}
+
+.cover-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cover-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.song-info {
+    min-width: 0;
+}
+
+.song-info .song-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.song-info .song-artist {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Playback Controls */
+.playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.ctrl-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-btn:hover {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+.ctrl-btn:active {
+    transform: scale(0.95);
+}
+
+.ctrl-btn.play-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+.ctrl-btn.play-btn:hover {
+    background: var(--accent-hover);
+    color: #fff;
+}
+
+/* Extra Controls */
+.extra-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    justify-content: flex-end;
+    max-width: 300px;
+}
+
+.time-display {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.time-sep {
+    margin: 0 4px;
+    opacity: 0.5;
+}
+
+.mode-btn {
+    font-size: 16px;
+}
+
+.mode-btn.shuffle i {
+    color: var(--accent);
+}
+
+.quality-btn {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 10px;
+    background: var(--bg-card);
+    border-radius: 4px;
+}
+
+.quality-btn:hover {
+    background: var(--bg-hover);
+    transform: none;
+}
+
+.quality-btn:active {
+    transform: none;
+}
+
+/* ============================================
+   Notification
+   ============================================ */
+
+.notification-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--accent);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: none;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    background: var(--accent);
+    border: none;
+}
+
+.toast.error {
+    background: #ff4444;
+    border: none;
+}
+
+/* ============================================
+   Responsive - Mobile
+   ============================================ */
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 60px;
+        --bottom-bar-height: 70px;
+    }
+
+    .song-item .item-cover {
+        display: none;
+    }
+
+    .song-item .item-album {
+        display: none;
+    }
+
+    .sidebar-header {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .logo i {
+        font-size: 24px;
+    }
+
+    .nav-menu {
+        padding: 12px 8px;
+    }
+
+    .nav-item {
+        padding: 14px;
+        justify-content: center;
+    }
+
+    .nav-item span {
+        display: none;
+    }
+
+    .nav-item i {
+        font-size: 20px;
+    }
+
+    .page {
+        padding: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .bar-content {
+        padding: 0 12px;
+    }
+
+    .now-playing {
+        max-width: 40%;
+    }
+
+    .cover-thumb {
+        width: 44px;
+        height: 44px;
+    }
+
+    .song-info .song-title {
+        font-size: 13px;
+    }
+
+    .song-info .song-artist {
+        font-size: 11px;
+    }
+
+    .extra-controls {
+        max-width: none;
+        gap: 8px;
+    }
+
+    .time-display,
+    .mode-btn {
+        display: none;
+    }
+
+    .ctrl-btn.play-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+
+    .playback-controls {
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .extra-controls {
+        display: none;
+    }
+
+    .playback-controls {
+        position: absolute;
+        right: 12px;
+    }
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   Immersive Player
+   ============================================ */
+
+.immersive-player {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(100%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.immersive-player.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.immersive-header {
+    padding: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.immersive-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 24px;
+    padding: 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.immersive-close:hover {
+    color: var(--text-primary);
+}
+
+.immersive-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 40px;
+    overflow: hidden;
+}
+
+.immersive-cover {
+    width: 280px;
+    height: 280px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.immersive-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.immersive-info {
+    text-align: center;
+    margin-top: 24px;
+    flex-shrink: 0;
+}
+
+.immersive-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.immersive-artist {
+    font-size: 16px;
+    color: var(--text-secondary);
+}
+
+.immersive-lyrics-full {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* 左对齐 */
+}
+
+.lyrics-scroll {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    /* 定义圆的半径 - 缩小半径 */
+    --lyric-radius: 90vh;
+    /* 定义圆心各行距离左侧的偏移 (圆边缘的位置) - 稍微左移 */
+    --lyric-left: 40vw;
+}
+
+.lyrics-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.lyric-line {
+    position: absolute;
+    /* 所有行初始都在垂直居中位置 */
+    top: 50%;
+    /* 水平位置固定 */
+    left: var(--lyric-left);
+    /* 旋转中心在左侧远端：圆心位置 = 当前left - 半径 */
+    transform-origin: calc(var(--lyric-radius) * -1) 50%;
+
+    white-space: nowrap;
+    padding: 12px 20px;
+    /* 增加一点padding */
+    font-size: 34px;
+    /* 增大基础字号 */
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.45);
+    /* 解决文字模糊问题 */
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    /* 禁止选中 */
+    user-select: none;
+    /* 性能优化 */
+    will-change: transform, opacity;
+    /* 仅保留颜色过渡，位置和透明度由JS每帧控制 */
+    transition: color 0.2s ease;
+}
+
+.lyric-line:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.lyric-line.active {
+    font-size: 34px;
+    /* 保持跟普通行一致 */
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+    z-index: 10;
+}
+
+.lyrics-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.3);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.lyrics-placeholder i {
+    font-size: 64px;
+    margin-bottom: 24px;
+    opacity: 0.8;
+}
+
+.lyrics-placeholder p {
+    font-size: 18px;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+/* Lyrics Toggle Button */
+.lyrics-toggle-container {
+    position: absolute;
+    bottom: 80px;
+    right: 40px;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    padding: 30px;
+    /* Larger hover area */
+    margin: -30px;
+    /* Compensate for padding */
+}
+
+.lyrics-toggle-container:hover {
+    opacity: 1;
+}
+
+.lyrics-toggle-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+}
+
+.lyrics-toggle-btn:hover {
+    color: #fff;
+}
+
+.lyrics-toggle-btn.active {
+    color: var(--accent);
+}
+
+/* Lyric Sub-text (trans/roma) */
+.lyric-sub {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+    display: none;
+}
+
+.lyric-line.show-sub .lyric-sub {
+    display: block;
+}
+
+.lyric-line.active .lyric-sub {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.immersive-controls {
+    padding: 24px 40px 40px;
+    flex-shrink: 0;
+}
+
+.immersive-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.immersive-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+    min-width: 40px;
+}
+
+.immersive-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.immersive-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.immersive-progress-bar:hover .immersive-progress-fill {
+    background: var(--accent-hover);
+}
+
+.immersive-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+}
+
+.immersive-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.immersive-btn:hover {
+    color: var(--accent);
+    transform: scale(1.1);
+}
+
+.immersive-btn.play {
+    width: 64px;
+    height: 64px;
+    background: var(--accent);
+    border-radius: 50%;
+    font-size: 24px;
+}
+
+.immersive-btn.play:hover {
+    background: var(--accent-hover);
+    color: #fff;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .immersive-content {
+        padding: 0 20px;
+    }
+
+    .immersive-cover {
+        width: 200px;
+        height: 200px;
+    }
+
+    .immersive-title {
+        font-size: 18px;
+    }
+
+    .immersive-artist {
+        font-size: 14px;
+    }
+
+    .lyric-line {
+        font-size: 14px;
+    }
+
+    .lyric-line.active {
+        font-size: 18px;
+    }
+
+    .immersive-controls {
+        padding: 20px 20px 32px;
+    }
+
+    .immersive-btns {
+        gap: 24px;
+    }
+
+    .immersive-btn.play {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+/* Make now-playing clickable */
+.now-playing {
+    cursor: pointer;
+    padding: 8px;
+    margin: -8px;
+    border-radius: var(--border-radius);
+    transition: background 0.2s ease;
+}
+
+.now-playing:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* 沉浸式播放页控制按钮 */
+.immersive-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 30px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    /* 默认更淡 */
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 100;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.immersive-close:hover {
+    opacity: 1;
+    color: #fff;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1), transparent 60%);
+}
+
+.immersive-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 40px;
+    /* 图标大一点 */
+    cursor: pointer;
+    z-index: 100;
+    padding: 100px 40px;
+    /* 大点击区域 */
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.immersive-nav:hover {
+    opacity: 1;
+    color: #fff;
+    /* 径向渐变背景，制造光晕效果 */
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+
+.immersive-prev {
+    left: 0;
+}
+
+.immersive-next {
+    right: 0;
+}
+
+/* ============================================
+   Detail Page Styles
+   ============================================ */
+
+.detail-page {
+    padding: 0 !important;
+}
+
+.detail-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 40px 32px 32px;
+    position: relative;
+}
+
+.detail-header .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    color: #fff;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.detail-header .back-btn:hover {
+    background: rgba(0, 0, 0, 0.6);
+    transform: scale(1.1);
+}
+
+.detail-cover {
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.detail-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.detail-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-info h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.detail-meta {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.detail-actions .primary-btn {
+    padding: 12px 28px;
+    font-size: 15px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detail-actions .primary-btn i {
+    font-size: 14px;
+}
+
+#detail-list {
+    padding: 0 32px 32px;
+}
+
+@media (max-width: 768px) {
+    .detail-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 60px 20px 24px;
+    }
+
+    .detail-cover {
+        width: 160px;
+        height: 160px;
+    }
+
+    .detail-info h1 {
+        font-size: 22px;
+    }
+
+    .detail-actions {
+        justify-content: center;
+    }
+
+    #detail-list {
+        padding: 0 16px 16px;
+    }
+}
+
+/* ============================================
+   Playlist Manager Styles
+   ============================================ */
+
+/* Hide input number arrows */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.header-action {
+    background: var(--bg-card);
+    border: none;
+    color: var(--text-secondary);
+    min-width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.header-action:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* Special style for Import Button */
+#import-playlist-btn {
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50px;
+    padding: 0 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* Neutral shadow to work with any color */
+    border: none;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+#import-playlist-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    background: var(--accent-hover);
+}
+
+/* Transitions for smooth theme switching */
+.song-item.active .item-title,
+.logo i,
+.sidebar-header i,
+.play-btn,
+.progress-fill,
+.volume-fill,
+#import-playlist-btn {
+    transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease;
+}
+
+#import-playlist-btn i {
+    font-size: 14px;
+}
+
+.playlist-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-primary);
+    padding-left: 4px;
+    border-left: 4px solid var(--accent);
+    line-height: 1.2;
+}
+
+.section-title button {
+    font-size: 14px;
+}
+
+.saved-playlists {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+.playlist-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.playlist-card:hover {
+    background: var(--bg-hover);
+    transform: translateY(-6px);
+    border-color: var(--border-color);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.playlist-card .card-cover {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.playlist-card .card-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playlist-card:hover .card-cover::after {
+    opacity: 1;
+}
+
+.playlist-card .card-cover .play-overlay {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(29, 185, 84, 0.4);
+}
+
+.playlist-card:hover .card-cover .play-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.playlist-card .card-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.playlist-card .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlist-card .card-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.playlist-card .delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.playlist-card:hover .delete-btn {
+    display: flex;
+}
+
+.playlist-card .delete-btn:hover {
+    background: #ff4444;
+}
+
+.clear-btn {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.2s;
+}
+
+.clear-btn:hover {
+    color: #ff4444;
+}
+
+.empty-hint {
+    color: var(--text-tertiary);
+    font-size: 14px;
+    padding: 20px 0;
+    text-align: center;
+    grid-column: 1 / -1;
+}
+
+/* History Page Specifics */
+.history-page .song-item {
+    opacity: 0.9;
+}
+
+/* ============================================
+   Modal Styles
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-container {
+    background: #1e1e1e;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #fff;
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.import-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: var(--bg-active);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--accent);
+}
+
+.primary-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 0 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.primary-btn:hover {
+    background: var(--accent-hover);
+}
+
+.user-playlist-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.select-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    gap: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.select-item:hover {
+    background: var(--bg-hover);
+}
+
+.select-item.selected {
+    background: rgba(29, 185, 84, 0.2);
+}
+
+.select-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.select-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.select-title {
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.select-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.selection-check {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.select-item.selected .selection-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.select-item.selected .selection-check::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 10px;
+}
+
+/* ============================================
+   Back to Top Button
+   ============================================ */
+
+.back-to-top {
+    position: fixed;
+    bottom: 120px;
+    right: 40px;
+    width: 48px;
+    height: 48px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    z-index: 90;
+    transform: translateY(20px);
+}
+
+.back-to-top.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: var(--accent-hover);
+    transform: translateY(-5px);
+}
+
+/* ============================================
+   Volume Slider
+   ============================================ */
+
+.volume-btn {
+    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
+
+.volume-slider {
+    -webkit-appearance: none;
+    width: 60px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    outline: none;
+    margin: 0 4px;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.time-display {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
