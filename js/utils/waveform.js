@@ -197,23 +197,24 @@ export class Waveform {
         if (this.currentUrl === url) return;
         this.currentUrl = url;
 
-        // Fade out old
-        this.targetOpacity = 0;
+        // ANIMATION STEP 1: SINK
+        // Keep active (opacity 1) so we see the bars sinking
+        this.targetOpacity = 1;
+
+        if (this.data.length > 0) {
+            // Trigger sink: target all zeros
+            this.targetData = new Array(this.data.length).fill(0);
+        }
+
+        // Wait for sink animation to be visible (250ms matches approx transition speed)
+        await new Promise(r => setTimeout(r, 250));
+
         this.isGenerating = true;
 
         // 1. Try to fetch and decode real audio (Limited by CORS)
         try {
             console.log('Waveform: Attempting to fetch real audio data...');
             // Check if we can fetch (simple head request check skipped, try direct)
-            const response = await fetch(url);
-            if (!response.ok) throw new Error('Fetch failed');
-
-            const arrayBuffer = await response.arrayBuffer();
-
-            if (!this.audioContext) {
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
             this.targetData = this.processAudioBuffer(audioBuffer);
             console.log('Waveform: Real audio data loaded.');
