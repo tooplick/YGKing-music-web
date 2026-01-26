@@ -133,6 +133,27 @@ export class Waveform {
                 this.opacity = this.targetOpacity;
             }
 
+            // Smooth Data Transition (Rise Up Effect)
+            if (this.targetData.length > 0) {
+                // Resize active data if needed
+                if (this.data.length !== this.targetData.length) {
+                    this.data = new Array(this.targetData.length).fill(0);
+                }
+
+                // Interpolate
+                let dataChanged = false;
+                for (let i = 0; i < this.targetData.length; i++) {
+                    const dDiff = this.targetData[i] - this.data[i];
+                    if (Math.abs(dDiff) > 0.001) {
+                        this.data[i] += dDiff * 0.15; // Animation speed
+                        dataChanged = true;
+                    } else {
+                        this.data[i] = this.targetData[i];
+                    }
+                }
+            }
+
+
             // Smooth Color Transition
             if (this.targetColor && this.currentColor) {
                 const lerp = (start, end, amt) => (1 - amt) * start + amt * end;
@@ -194,15 +215,22 @@ export class Waveform {
             }
 
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-            this.data = this.processAudioBuffer(audioBuffer);
+            this.targetData = this.processAudioBuffer(audioBuffer);
             console.log('Waveform: Real audio data loaded.');
 
         } catch (e) {
             console.warn('Waveform: Failed to load real audio (likely CORS or Network), using fallback.');
             // 2. Fallback: Generate pseudo-waveform based on ID
-            this.data = this.generatePseudoWaveform(id);
+            this.targetData = this.generatePseudoWaveform(id);
         } finally {
             this.isGenerating = false;
+
+            // Prepare for rise animation:
+            // Ensure data is zeroed out to start fresh rise
+            if (this.targetData.length > 0) {
+                this.data = new Array(this.targetData.length).fill(0);
+            }
+
             // Fade in new
             this.targetOpacity = 1;
         }
