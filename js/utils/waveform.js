@@ -435,3 +435,4 @@ export class Waveform {
         this.ctx.globalAlpha = 1;
     }
 }
+ 
