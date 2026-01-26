@@ -495,9 +495,10 @@ class UIManager {
 
         // 更新封面 - 使用候选列表和回退机制
         const coverCandidates = getCoverCandidates(song, 300);
-        this.els.thumbImg.src = coverCandidates[0];
         this.els.thumbImg._coverCandidates = coverCandidates;
         this.els.thumbImg.dataset.coverIndex = '0';
+
+        // Define onerror handler BEFORE setting src
         this.els.thumbImg.onerror = function () {
             const currentIndex = parseInt(this.dataset.coverIndex) || 0;
             const nextIndex = currentIndex + 1;
@@ -506,6 +507,9 @@ class UIManager {
                 this.src = this._coverCandidates[nextIndex];
             }
         };
+
+        // Now set the src
+        this.els.thumbImg.src = coverCandidates[0];
 
         // 更新背景 (使用第一个候选)
         this.setBackground(coverCandidates[0]);
@@ -1477,7 +1481,7 @@ class SearchManager {
             item.className = 'song-item';
             item.innerHTML = `
                 <div class="item-cover">
-                    <img src="${coverCandidates[0]}" loading="lazy" data-cover-index="0">
+                    <img data-src="${coverCandidates[0]}" loading="lazy" data-cover-index="0">
                 </div>
                 <div class="item-info">
                     <div class="item-title">${song.title || song.name}</div>
@@ -1505,6 +1509,8 @@ class SearchManager {
                     this.src = this._coverCandidates[nextIndex];
                 }
             };
+            // Set src AFTER attaching error handler to avoid race condition
+            img.src = coverCandidates[0];
 
             const songData = {
                 mid: song.mid,
