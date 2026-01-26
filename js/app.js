@@ -560,7 +560,8 @@ class UIManager {
         const fragment = document.createDocumentFragment();
 
         queue.forEach((song, i) => {
-            const cover = getCoverUrlSync(song, 300);
+            // Use fallback logic by default via candidates
+            const coverCandidates = getCoverCandidates(song, 300);
             const isActive = !isHistory && !isDetailPage && i === currentIndex;
 
             const albumName = song.album?.name || '';
@@ -570,7 +571,7 @@ class UIManager {
             div.className = `song-item ${isActive ? 'active' : ''}`;
             div.innerHTML = `
                 <div class="item-cover">
-                    <img src="${cover}" loading="lazy">
+                    <img data-src="${coverCandidates[0]}" loading="lazy" data-cover-index="0">
                 </div>
                 <div class="item-info">
                     <div class="item-title">${song.title || song.name}</div>
@@ -597,6 +598,19 @@ class UIManager {
                 </div>
                 ` : ''}
             `;
+
+            // Robust cover loading with cleanup for race conditions
+            const img = div.querySelector('img');
+            img._coverCandidates = coverCandidates;
+            img.onerror = function () {
+                const currentIndex = parseInt(this.dataset.coverIndex) || 0;
+                const nextIndex = currentIndex + 1;
+                if (nextIndex < this._coverCandidates.length) {
+                    this.dataset.coverIndex = nextIndex;
+                    this.src = this._coverCandidates[nextIndex];
+                }
+            };
+            img.src = coverCandidates[0];
 
             div.addEventListener('click', (e) => {
                 // Handle Add Button Click for Detail Page
