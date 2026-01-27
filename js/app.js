@@ -1026,6 +1026,7 @@ class PlayerManager {
         this.queue = [];
         this.currentIndex = -1;
         this.playMode = 'sequence'; // sequence, repeat_one, shuffle
+        this.isNextPending = false; // Flag for "Add to Next" priority
 
         this.urlCache = new Map();
 
@@ -1248,6 +1249,7 @@ class PlayerManager {
             this.queue.splice(this.currentIndex + 1, 0, song);
         }
 
+        this.isNextPending = true;
         this.saveQueue();
         this.ui.renderPlaylist(this.queue, this.currentIndex);
         this.ui.notify(`下一首播放: ${song.title || song.name}`);
@@ -1268,6 +1270,10 @@ class PlayerManager {
 
     playFromQueue(index) {
         if (index < 0 || index >= this.queue.length) return;
+
+        // Reset the "next pending" flag as we are now playing a specific song
+        this.isNextPending = false;
+
         this.currentIndex = index;
         localStorage.setItem('qqmusic_currentIndex', index.toString());
 
@@ -1306,7 +1312,10 @@ class PlayerManager {
         if (this.queue.length === 0) return;
 
         let nextIndex;
-        if (this.playMode === 'shuffle') {
+        // Prioritize "Add to Next" song even in shuffle mode
+        if (this.isNextPending) {
+            nextIndex = (this.currentIndex + 1) % this.queue.length;
+        } else if (this.playMode === 'shuffle') {
             nextIndex = Math.floor(Math.random() * this.queue.length);
         } else {
             nextIndex = (this.currentIndex + 1) % this.queue.length;
