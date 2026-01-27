@@ -1026,7 +1026,7 @@ class PlayerManager {
         this.queue = [];
         this.currentIndex = -1;
         this.playMode = 'sequence'; // sequence, repeat_one, shuffle
-        this.isNextPending = false; // Flag for "Add to Next" priority
+        this.nextPendingCount = 0; // Counter for "Add to Next" priority songs
 
         this.urlCache = new Map();
 
@@ -1249,7 +1249,7 @@ class PlayerManager {
             this.queue.splice(this.currentIndex + 1, 0, song);
         }
 
-        this.isNextPending = true;
+        this.nextPendingCount++;
         this.saveQueue();
         this.ui.renderPlaylist(this.queue, this.currentIndex);
         this.ui.notify(`下一首播放: ${song.title || song.name}`);
@@ -1268,11 +1268,13 @@ class PlayerManager {
         this.ui.notify(`已播放歌单，共 ${newQueue.length} 首`);
     }
 
-    playFromQueue(index) {
+    playFromQueue(index, maintainPending = false) {
         if (index < 0 || index >= this.queue.length) return;
 
-        // Reset the "next pending" flag as we are now playing a specific song
-        this.isNextPending = false;
+        // Reset the "next pending" counter if not maintaining (e.g., manual click)
+        if (!maintainPending) {
+            this.nextPendingCount = 0;
+        }
 
         this.currentIndex = index;
         localStorage.setItem('qqmusic_currentIndex', index.toString());
@@ -1312,20 +1314,27 @@ class PlayerManager {
         if (this.queue.length === 0) return;
 
         let nextIndex;
-        // Prioritize "Add to Next" song even in shuffle mode
-        if (this.isNextPending) {
+        let maintainPending = false;
+
+        // Prioritize "Add to Next" songs even in shuffle mode
+        if (this.nextPendingCount > 0) {
             nextIndex = (this.currentIndex + 1) % this.queue.length;
+            this.nextPendingCount--;
+            maintainPending = true;
         } else if (this.playMode === 'shuffle') {
             nextIndex = Math.floor(Math.random() * this.queue.length);
         } else {
             nextIndex = (this.currentIndex + 1) % this.queue.length;
         }
 
-        this.playFromQueue(nextIndex);
+        this.playFromQueue(nextIndex, maintainPending);
     }
 
     prev() {
         if (this.queue.length === 0) return;
+
+        // Reset priority on prev? Usually yes, previous breaks the flow
+        this.nextPendingCount = 0;
 
         let prevIndex;
         if (this.playMode === 'shuffle') {
