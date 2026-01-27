@@ -55,7 +55,7 @@ export async function extractDominantColor(imageUrl) {
 
                 if (count === 0) {
                     // Fallback to default accent color
-                    resolve({ r: 29, g: 185, b: 84, hex: '#1db954' });
+                    resolve({ r: 29, g: 185, b: 84, hex: '#1db954', isFallback: true });
                     return;
                 }
 
@@ -75,16 +75,16 @@ export async function extractDominantColor(imageUrl) {
 
                 const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 
-                resolve({ r, g, b, hex });
+                resolve({ r, g, b, hex, isFallback: false });
             } catch (e) {
                 console.warn('Color extraction failed:', e);
-                resolve({ r: 29, g: 185, b: 84, hex: '#1db954' });
+                resolve({ r: 29, g: 185, b: 84, hex: '#1db954', isFallback: true });
             }
         };
 
         img.onerror = () => {
             console.warn('Failed to load image for color extraction');
-            resolve({ r: 29, g: 185, b: 84, hex: '#1db954' });
+            resolve({ r: 29, g: 185, b: 84, hex: '#1db954', isFallback: true });
         };
 
         img.src = proxyUrl;

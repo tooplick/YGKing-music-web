@@ -1144,23 +1144,34 @@ class PlayerManager {
             }
 
             // Extract dominant color from cover and update waveform
-            const coverUrl = getCoverUrlSync(song);
-            extractDominantColor(coverUrl).then(color => {
+            (async () => {
+                const coverCandidates = getCoverCandidates(song, 300);
+                let color = null;
+
+                // Try candidates in order
+                for (const url of coverCandidates) {
+                    const result = await extractDominantColor(url);
+                    if (!result.isFallback) {
+                        color = result;
+                        break;
+                    }
+                }
+
+                // If all failed or resulted in fallback, we use the default/last result
+                if (!color) {
+                    color = { hex: '#1db954' };
+                }
+
                 if (this.ui.waveform) {
                     this.ui.waveform.setColor(color.hex);
                 }
 
                 // Update theme color
                 document.documentElement.style.setProperty('--accent', color.hex);
-                // Create a slightly brighter/different hover color
-                // For simplicity, just use the same color or a hardcoded bright variant is tricky without color manipulation lib
-                // Let's just use the same color for now, or maybe adjust opacity if needed.
-                // Or better, let's just saturate it a bit or reuse the color logic from color.js if we exported it
-                // Simple string concat for now:
-                document.documentElement.style.setProperty('--accent-hover', color.hex);
 
-                // Optional: Dynamic favicon (if desired, but user didn't explicitly ask for favicon, just "page theme color")
-            });
+                // Update hover color (same for now, or could use CSS filter)
+                document.documentElement.style.setProperty('--accent-hover', color.hex);
+            })();
 
             // Update page title
             const artistName = song.singers || song.singer?.map(s => s.name).join(', ') || song.singername || '未知歌手';
