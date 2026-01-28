@@ -24,7 +24,12 @@ export class Waveform {
         this.targetOpacity = 0;
         this.animationFrame = null;
 
-        this.audioContext = null;
+        this.animationFrame = null;
+
+        // Re-use global context or create new
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new AudioContext();
+
         this.currentUrl = null;
         this.isGenerating = false;
 
