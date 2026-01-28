@@ -2051,6 +2051,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             lyricsScroll.classList.add('slide-out');
             await new Promise(r => setTimeout(r, 300)); // Wait for slide-out animation
             lyricsScroll.classList.remove('slide-out');
+
+            // Clear old lyrics content immediately to prevent residual display
+            lyricsScroll.innerHTML = '';
+            ui.lyricElements = [];
+            ui.lineRenderIndices = null;
         }
 
         try {
