@@ -749,24 +749,26 @@ class UIManager {
         if (mainLines.length === 0) {
             this.els.lyricsScroll.innerHTML = '';
 
+            // Try to initialize visualizer if missing
+            if (!this.visualizer && window.playerManager) {
+                // Create temp canvas to init object (it will be appended below)
+                const canvas = document.createElement('canvas');
+                canvas.id = 'immersive-visualizer';
+                const { analyser } = window.playerManager.getAudioContext();
+                this.visualizer = new Visualizer(canvas, analyser);
+            }
+
             // Activate Visualizer
             if (this.visualizer) {
-                // Create container for canvas if not exists
+                // Ensure container and canvas are in DOM
                 let vizContainer = this.els.lyricsScroll.querySelector('#immersive-visualizer-container');
                 if (!vizContainer) {
                     vizContainer = document.createElement('div');
                     vizContainer.id = 'immersive-visualizer-container';
-                    // Create canvas inside
-                    const canvas = document.createElement('canvas');
-                    canvas.id = 'immersive-visualizer';
-                    vizContainer.appendChild(canvas);
+                    // Use the canvas from the visualizer instance
+                    vizContainer.appendChild(this.visualizer.canvas);
                     this.els.lyricsScroll.appendChild(vizContainer);
-
-                    // Re-init visualizer with new canvas
-                    if (window.playerManager) {
-                        const { analyser } = window.playerManager.getAudioContext();
-                        this.visualizer = new Visualizer(canvas, analyser);
-                    }
+                    this.visualizer.resize();
                 }
 
                 this.usingVisualizer = true;

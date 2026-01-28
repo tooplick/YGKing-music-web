@@ -213,8 +213,11 @@ export class Waveform {
 
         // 1. Try to fetch and decode real audio (Limited by CORS)
         try {
-            console.log('Waveform: Attempting to fetch real audio data...');
-            // Check if we can fetch (simple head request check skipped, try direct)
+            console.log('Waveform: Attempting to fetch real audio data from:', url);
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const arrayBuffer = await response.arrayBuffer();
+
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
             this.targetData = this.processAudioBuffer(audioBuffer);
             console.log('Waveform: Real audio data loaded.');
@@ -435,4 +438,4 @@ export class Waveform {
         this.ctx.globalAlpha = 1;
     }
 }
- 
+
