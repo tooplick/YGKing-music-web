@@ -1694,6 +1694,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.savedPlaylistManager = savedPlaylistManager;
 
     const player = new PlayerManager(ui);
+    window.playerManager = player; // Expose for UIManager/Visualizer access
     const search = new SearchManager(ui);
 
     // Make player globally accessible
