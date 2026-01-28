@@ -70,8 +70,7 @@
 npm install -g wrangler
 
 # 创建本地 D1 数据库
-wrangler d1 create qqmusic-credentials --local
-wrangler d1 execute qqmusic-credentials --local --file=./schema.sql # 如果有 sql 文件
+wrangler d1 execute credentials --local --file=./schema.sql # 如果有 sql 文件
 
 # 启动开发服务器
 wrangler pages dev .
