@@ -69,9 +69,9 @@ export async function extractDominantColor(imageUrl) {
                 const mid = (max + min) / 2;
 
                 const boost = 1.2;
-                r = Math.min(255, Math.round(mid + (r - mid) * boost));
-                g = Math.min(255, Math.round(mid + (g - mid) * boost));
-                b = Math.min(255, Math.round(mid + (b - mid) * boost));
+                r = Math.max(0, Math.min(255, Math.round(mid + (r - mid) * boost)));
+                g = Math.max(0, Math.min(255, Math.round(mid + (g - mid) * boost)));
+                b = Math.max(0, Math.min(255, Math.round(mid + (b - mid) * boost)));
 
                 const hex = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 
