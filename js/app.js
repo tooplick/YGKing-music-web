@@ -668,6 +668,13 @@ class UIManager {
     openImmersivePlayer() {
         this.els.immersivePlayer.classList.add('active');
         document.body.style.overflow = 'hidden';
+
+        // Force layout update and visualizer resize
+        this.updateImmersiveLayout();
+        if (this.visualizer && this.usingVisualizer) {
+            this.visualizer.resize();
+            this.visualizer.start();
+        }
         this.startRenderLoop();
     }
 
