@@ -23,7 +23,8 @@ export class Visualizer {
 
         // Handle resize
         this.resize();
-        window.addEventListener('resize', () => this.resize());
+        this.resizeHandler = () => this.resize();
+        window.addEventListener('resize', this.resizeHandler);
     }
 
     resize() {
@@ -66,6 +67,13 @@ export class Visualizer {
         }
         this.canvas.style.opacity = '0';
         this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+
+    destroy() {
+        this.stop();
+        if (this.resizeHandler) {
+            window.removeEventListener('resize', this.resizeHandler);
+        }
     }
 
     draw() {
