@@ -2042,8 +2042,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // 歌词加载函数
+    // 歌词加载函数（带转场动画）
     async function loadLyricsForSong(mid) {
+        const lyricsScroll = ui.els.lyricsScroll;
+
+        // Step 1: Slide out old lyrics (if any exist)
+        if (ui.lyricElements && ui.lyricElements.length > 0) {
+            lyricsScroll.classList.add('slide-out');
+            await new Promise(r => setTimeout(r, 300)); // Wait for slide-out animation
+            lyricsScroll.classList.remove('slide-out');
+        }
+
         try {
             const lyrics = await getLyric(mid);
             ui.renderLyrics(lyrics);
@@ -2051,6 +2060,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Failed to load lyrics:', e);
             ui.renderLyrics(null);
         }
+
+        // Step 2: Slide in new lyrics
+        lyricsScroll.classList.add('slide-in');
+        await new Promise(r => setTimeout(r, 300)); // Wait for slide-in animation
+        lyricsScroll.classList.remove('slide-in');
     }
 
     // 歌曲切换时重新加载歌词
