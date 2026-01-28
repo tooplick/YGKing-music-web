@@ -2046,19 +2046,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadLyricsForSong(mid) {
         const lyricsScroll = ui.els.lyricsScroll;
 
-        // Mark as transitioning to prevent render conflicts
-        lyricsScroll.classList.add('transitioning');
-
-        // Step 1: Slide out old lyrics (if any exist)
+        // Step 1: Fade out and slide out old lyrics (if any exist)
         if (ui.lyricElements && ui.lyricElements.length > 0) {
             // Stop render loop to prevent ghost images
             ui.stopRenderLoop();
 
+            // First: smooth fade out
+            lyricsScroll.classList.add('fade-out');
+            await new Promise(r => setTimeout(r, 250)); // Wait for fade-out transition
+
+            // Then: mark as transitioning (hard hide) and do slide-out
+            lyricsScroll.classList.add('transitioning');
+            lyricsScroll.classList.remove('fade-out');
             lyricsScroll.classList.add('slide-out');
             await new Promise(r => setTimeout(r, 300)); // Wait for slide-out animation
             lyricsScroll.classList.remove('slide-out');
 
-            // Clear old lyrics content immediately to prevent residual display
+            // Clear old lyrics content
             lyricsScroll.innerHTML = '';
             ui.lyricElements = [];
             ui.lineRenderIndices = null;
