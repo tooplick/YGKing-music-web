@@ -220,20 +220,9 @@ export class Waveform {
         try {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-            // Race Check 1
-            if (this.currentUrl !== url) return;
-
             const arrayBuffer = await response.arrayBuffer();
 
-            // Race Check 2
-            if (this.currentUrl !== url) return;
-
             const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-
-            // Race Check 3
-            if (this.currentUrl !== url) return;
-
             this.targetData = this.processAudioBuffer(audioBuffer);
 
         } catch (e) {

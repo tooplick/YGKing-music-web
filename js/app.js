@@ -2157,28 +2157,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 歌词加载函数
     async function loadLyricsForSong(mid) {
-        // Prevent race condition: track what we are loading
-        ui.loadingLyricsMid = mid;
-
         try {
             const lyrics = await getLyric(mid);
-
-            // Check if we still want this song's lyrics
-            // 1. Check against the last requested mid
-            if (ui.loadingLyricsMid !== mid) return;
-
-            // 2. Double check against current playing song (if player available)
-            if (window.player && window.player.queue[window.player.currentIndex]) {
-                const currentMid = window.player.queue[window.player.currentIndex].mid;
-                if (currentMid !== mid) return;
-            }
-
             ui.renderLyrics(lyrics);
         } catch (e) {
             console.error('Failed to load lyrics:', e);
-            if (ui.loadingLyricsMid === mid) {
-                ui.renderLyrics(null);
-            }
+            ui.renderLyrics(null);
         }
     }
 
