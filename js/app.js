@@ -799,7 +799,8 @@ class UIManager {
             // 4. Start
             if (this.visualizer) {
                 this.usingVisualizer = true;
-                this.visualizer.resize();
+                // Don't resize here! It clears canvas on every frame.
+                // visualizer.resize() is handled by openImmersivePlayer and window resize event
                 this.visualizer.start();
             } else {
                 // Fallback
