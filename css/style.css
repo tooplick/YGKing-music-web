@@ -1969,3 +1969,40 @@ input[type=number] {
     align-items: center;
     white-space: nowrap;
 }
+
+/* ============================================
+   Immersive Visualizer
+   ============================================ */
+
+#immersive-visualizer-container {
+    position: absolute;
+    top: 50%;
+    left: 45%;
+    /* Slightly offset to visually center in the rotated space */
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    z-index: 1;
+    /* Behind lyrics but visible */
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#immersive-visualizer {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+}
+
+/* Adjust for mobile */
+@media (max-width: 768px) {
+    #immersive-visualizer-container {
+        width: 300px;
+        height: 300px;
+        left: 50%;
+    }
+}

@@ -52,10 +52,20 @@ export async function getSongUrls(mids, fileType = SongFileType.MP3_128, credent
     const urls = {};
     const domain = 'https://isure.stream.qqmusic.qq.com/';
 
+    // Check if we are in environment that needs proxy (development or production)
+    const useProxy = true; // For now, force proxy to ensure CORS works for visualizer
+    const proxyBase = '/api/audio?url=';
+
     if (result.midurlinfo) {
         for (const info of result.midurlinfo) {
             const purl = info.purl || info.wifiurl || '';
-            urls[info.songmid] = purl ? domain + purl : '';
+            if (purl) {
+                const fullUrl = domain + purl;
+                // Use proxy to ensure CORS headers for Web Audio API
+                urls[info.songmid] = useProxy ? proxyBase + encodeURIComponent(fullUrl) : fullUrl;
+            } else {
+                urls[info.songmid] = '';
+            }
         }
     }
 

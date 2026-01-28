@@ -12,6 +12,7 @@ import { getSongListDetail, getUserSongLists } from './api/songlist.js';
 import { getValidCoverUrl, getCoverUrlSync, getCoverCandidates, DEFAULT_COVER } from './utils/cover.js';
 import { Waveform } from './utils/waveform.js';
 import { extractDominantColor } from './utils/color.js';
+import { Visualizer } from './utils/visualizer.js';
 
 // Utility functions
 function formatTime(seconds) {
@@ -747,16 +748,52 @@ class UIManager {
 
         if (mainLines.length === 0) {
             this.els.lyricsScroll.innerHTML = '';
-            const el = document.createElement('div');
-            el.className = 'lyric-line active';
-            el.textContent = '暂无歌词';
-            el.style.transform = 'rotate(-6deg)';
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-            this.els.lyricsScroll.appendChild(el);
+
+            // Activate Visualizer
+            if (this.visualizer) {
+                // Create container for canvas if not exists
+                let vizContainer = this.els.lyricsScroll.querySelector('#immersive-visualizer-container');
+                if (!vizContainer) {
+                    vizContainer = document.createElement('div');
+                    vizContainer.id = 'immersive-visualizer-container';
+                    // Create canvas inside
+                    const canvas = document.createElement('canvas');
+                    canvas.id = 'immersive-visualizer';
+                    vizContainer.appendChild(canvas);
+                    this.els.lyricsScroll.appendChild(vizContainer);
+
+                    // Re-init visualizer with new canvas
+                    if (window.playerManager) {
+                        const { analyser } = window.playerManager.getAudioContext();
+                        this.visualizer = new Visualizer(canvas, analyser);
+                    }
+                }
+
+                this.usingVisualizer = true;
+                this.visualizer.start();
+            } else {
+                // Fallback if visualizer failed to load
+                const el = document.createElement('div');
+                el.className = 'lyric-line active';
+                el.textContent = '暂无歌词';
+                el.style.transform = 'rotate(-6deg)';
+                el.style.opacity = '1';
+                el.style.visibility = 'visible';
+                this.els.lyricsScroll.appendChild(el);
+            }
+
             this.lyricElements = [];
             if (toggleContainer) toggleContainer.style.display = 'none';
             return;
+        } else {
+            // Disable visualizer if we have lyrics
+            if (this.visualizer) {
+                this.visualizer.stop();
+                this.usingVisualizer = false;
+                // Remove container
+                const vizContainer = this.els.lyricsScroll.querySelector('#immersive-visualizer-container');
+                if (vizContainer) vizContainer.remove();
+            }
         }
 
         // Render lyric lines with sub-text
@@ -926,6 +963,14 @@ class UIManager {
     // 初始化沉浸式播放页逻辑
     initImmersivePlayer() {
         this.updateImmersiveLayout();
+
+        // Initialize Visualizer
+        const vizCanvas = document.getElementById('immersive-visualizer');
+        if (vizCanvas && window.playerManager) {
+            const { analyser } = window.playerManager.getAudioContext();
+            this.visualizer = new Visualizer(vizCanvas, analyser);
+        }
+
         window.addEventListener('resize', () => {
             if (this.resizeTimeout) cancelAnimationFrame(this.resizeTimeout);
             this.resizeTimeout = requestAnimationFrame(() => this.updateImmersiveLayout());
@@ -941,9 +986,18 @@ class UIManager {
 
         const spacing = 80;
         this.currentAngleStep = (spacing / radius) * 57.2958;
+
+        if (this.visualizer) {
+            this.visualizer.resize();
+        }
     }
 
     renderFrame() {
+        // If using visualizer, ensure loop keeps running but don't do lyric transform
+        if (this.usingVisualizer) {
+            return;
+        }
+
         if (!this.lyricElements || this.lyricElements.length === 0) return;
 
         if (!this.userScrolling) {
@@ -1076,6 +1130,8 @@ class PlayerManager {
     }
 
     initAudio() {
+        this.audio.crossOrigin = "anonymous"; // Enable CORS for Web Audio API
+
         this.audio.onended = () => {
             if (this.playMode === 'repeat_one') {
                 this.audio.currentTime = 0;
@@ -1089,7 +1145,10 @@ class PlayerManager {
             this.ui.updateProgress(this.audio.currentTime, this.audio.duration);
         };
 
-        this.audio.onplay = () => this.ui.setPlaying(true);
+        this.audio.onplay = () => {
+            this.ui.setPlaying(true);
+            this.resumeAudioContext();
+        };
         this.audio.onpause = () => this.ui.setPlaying(false);
 
         // Media Session
@@ -1098,6 +1157,28 @@ class PlayerManager {
             navigator.mediaSession.setActionHandler('pause', () => this.pause());
             navigator.mediaSession.setActionHandler('previoustrack', () => this.prev());
             navigator.mediaSession.setActionHandler('nexttrack', () => this.next());
+        }
+    }
+
+    // Lazy load AudioContext
+    getAudioContext() {
+        if (!this.audioContext) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.audioContext = new AudioContext();
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 256; // Configurable
+
+            // Connect Audio Element -> Analyser -> Destination
+            this.source = this.audioContext.createMediaElementSource(this.audio);
+            this.source.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+        }
+        return { context: this.audioContext, analyser: this.analyser };
+    }
+
+    resumeAudioContext() {
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
         }
     }
 
