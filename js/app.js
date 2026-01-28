@@ -671,9 +671,16 @@ class UIManager {
 
         // Force layout update and visualizer resize
         this.updateImmersiveLayout();
+
         if (this.visualizer && this.usingVisualizer) {
-            this.visualizer.resize();
-            this.visualizer.start();
+            // Add slight delay to ensure CSS transition/display change has applied
+            // so that resize() gets correct dimensions
+            setTimeout(() => {
+                if (this.els.immersivePlayer.classList.contains('active')) {
+                    this.visualizer.resize();
+                    this.visualizer.start();
+                }
+            }, 50);
         }
         this.startRenderLoop();
     }
@@ -681,6 +688,11 @@ class UIManager {
     closeImmersivePlayer() {
         this.els.immersivePlayer.classList.remove('active');
         document.body.style.overflow = '';
+
+        // Stop visualizer to save resources and reset state
+        if (this.visualizer) {
+            this.visualizer.stop();
+        }
         this.stopRenderLoop();
     }
 
