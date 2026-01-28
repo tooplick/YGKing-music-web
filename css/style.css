@@ -1057,10 +1057,18 @@ body.playing .bg-layer {
 /* Lyrics Transition Animations */
 .lyrics-scroll.slide-out {
     animation: lyricsSlideOut 0.3s ease-in forwards;
+    pointer-events: none;
 }
 
 .lyrics-scroll.slide-in {
     animation: lyricsSlideIn 0.3s ease-out forwards;
+}
+
+/* Force hide all lyric lines during transition to prevent ghost images */
+.lyrics-scroll.slide-out .lyric-line,
+.lyrics-scroll.transitioning .lyric-line {
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 @keyframes lyricsSlideOut {

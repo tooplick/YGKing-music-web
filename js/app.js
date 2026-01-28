@@ -2046,8 +2046,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadLyricsForSong(mid) {
         const lyricsScroll = ui.els.lyricsScroll;
 
+        // Mark as transitioning to prevent render conflicts
+        lyricsScroll.classList.add('transitioning');
+
         // Step 1: Slide out old lyrics (if any exist)
         if (ui.lyricElements && ui.lyricElements.length > 0) {
+            // Stop render loop to prevent ghost images
+            ui.stopRenderLoop();
+
             lyricsScroll.classList.add('slide-out');
             await new Promise(r => setTimeout(r, 300)); // Wait for slide-out animation
             lyricsScroll.classList.remove('slide-out');
@@ -2070,6 +2076,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         lyricsScroll.classList.add('slide-in');
         await new Promise(r => setTimeout(r, 300)); // Wait for slide-in animation
         lyricsScroll.classList.remove('slide-in');
+
+        // Remove transitioning state and restart render loop
+        lyricsScroll.classList.remove('transitioning');
+        ui.startRenderLoop();
     }
 
     // 歌曲切换时重新加载歌词
