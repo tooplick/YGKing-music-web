@@ -223,7 +223,7 @@ export class Waveform {
             console.log('Waveform: Real audio data loaded.');
 
         } catch (e) {
-            console.warn('Waveform: Failed to load real audio (likely CORS or Network), using fallback.');
+            console.warn('Waveform: Failed to load real audio (likely CORS or Network), using fallback.', e);
             // 2. Fallback: Generate pseudo-waveform based on ID
             this.targetData = this.generatePseudoWaveform(id);
         } finally {

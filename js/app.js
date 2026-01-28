@@ -749,32 +749,41 @@ class UIManager {
         if (mainLines.length === 0) {
             this.els.lyricsScroll.innerHTML = '';
 
-            // Try to initialize visualizer if missing
-            if (!this.visualizer && window.playerManager) {
-                // Create temp canvas to init object (it will be appended below)
-                const canvas = document.createElement('canvas');
-                canvas.id = 'immersive-visualizer';
-                const { analyser } = window.playerManager.getAudioContext();
-                this.visualizer = new Visualizer(canvas, analyser);
+            // 1. Ensure/Create Container
+            let vizContainer = this.els.lyricsScroll.querySelector('#immersive-visualizer-container');
+            if (!vizContainer) {
+                vizContainer = document.createElement('div');
+                vizContainer.id = 'immersive-visualizer-container';
+                this.els.lyricsScroll.appendChild(vizContainer);
             }
 
-            // Activate Visualizer
-            if (this.visualizer) {
-                // Ensure container and canvas are in DOM
-                let vizContainer = this.els.lyricsScroll.querySelector('#immersive-visualizer-container');
-                if (!vizContainer) {
-                    vizContainer = document.createElement('div');
-                    vizContainer.id = 'immersive-visualizer-container';
-                    // Use the canvas from the visualizer instance
-                    vizContainer.appendChild(this.visualizer.canvas);
-                    this.els.lyricsScroll.appendChild(vizContainer);
+            // 2. Ensure/Create Canvas
+            let canvas = vizContainer.querySelector('#immersive-visualizer');
+            if (!canvas) {
+                canvas = document.createElement('canvas');
+                canvas.id = 'immersive-visualizer';
+                vizContainer.appendChild(canvas);
+            }
+
+            // 3. Init Visualizer if needed
+            if (window.playerManager) {
+                if (!this.visualizer) {
+                    const { analyser } = window.playerManager.getAudioContext();
+                    this.visualizer = new Visualizer(canvas, analyser);
+                } else if (this.visualizer.canvas !== canvas) {
+                    this.visualizer.canvas = canvas;
+                    this.visualizer.ctx = canvas.getContext('2d');
                     this.visualizer.resize();
                 }
+            }
 
+            // 4. Start
+            if (this.visualizer) {
                 this.usingVisualizer = true;
+                this.visualizer.resize();
                 this.visualizer.start();
             } else {
-                // Fallback if visualizer failed to load
+                // Fallback
                 const el = document.createElement('div');
                 el.className = 'lyric-line active';
                 el.textContent = '暂无歌词';
