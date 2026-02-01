@@ -311,12 +311,14 @@ class UIManager {
         btn.className = 'back-to-top';
         btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
         document.body.appendChild(btn);
+        this.backToTopBtn = btn; // 保存引用
 
         // Scroll listener
         const mainContent = document.querySelector('.main-content');
         if (mainContent) {
             mainContent.addEventListener('scroll', () => {
-                if (mainContent.scrollTop > 300) {
+                // 只在搜索页显示
+                if (this.currentPage === 'search' && mainContent.scrollTop > 300) {
                     btn.classList.add('show');
                 } else {
                     btn.classList.remove('show');
